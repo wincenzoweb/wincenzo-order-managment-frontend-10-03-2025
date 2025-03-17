@@ -3,6 +3,7 @@ import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import Icon from "@/components/ui/Icon";
 import Tooltip from "@/components/ui/Tooltip";
+import Loading from "@/components/Loading";
 import {
     useTable, useRowSelect, useSortBy, usePagination,
     // useGlobalFilter,
@@ -45,7 +46,7 @@ const PaymentList = () => {
 
     const [filterByDuplicateArticalNumber, setFilterByDuplicateArticalNumber] = useState(false);
 
-    const { paymentdata, totalData, totalPages, currentPage, duplicateArticleNumbers, totalDuplicateNumbers } = useSelector((state) => state.paymentdata);
+    const { paymentdata, isLoading, totalData, totalPages, currentPage, duplicateArticleNumbers, totalDuplicateNumbers } = useSelector((state) => state.paymentdata);
     const role = useSelector((state) => state.user?.loggedInUser?.role);
     const handleValueChange = (newValue) => {
         setSelectedStartDate(newValue.startDate);
@@ -486,6 +487,10 @@ const PaymentList = () => {
         });
         setCsvData(dataToExport);
     };
+
+    // Add this check for showing loader
+    const shouldShowLoader = isLoading || !paymentdata || paymentdata.length === 0;
+
     return (
         <>
             <Card>
@@ -548,59 +553,65 @@ const PaymentList = () => {
                 </div>
                 <div className="overflow-x-auto -mx-6">
                     <div className="inline-block min-w-full align-middle">
-                        <div className="overflow-hidden ">
-                            <table
-                                className="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700"
-                                {...getTableProps}
-                            >
-                                <thead className="bg-slate-200 dark:bg-slate-700">
-                                    {headerGroups.map((headerGroup) => (
-                                        <tr {...headerGroup.getHeaderGroupProps()}>
-                                            {headerGroup.headers.map((column) => (
-                                                <th
-                                                    {...column.getHeaderProps(
-                                                        column.getSortByToggleProps()
-                                                    )}
-                                                    scope="col"
-                                                    className=" table-th "
-                                                >
-                                                    {column.render("Header")}
-                                                    <span>
-                                                        {column.isSorted
-                                                            ? column.isSortedDesc
-                                                                ? " 🔽"
-                                                                : " 🔼"
-                                                            : ""}
-                                                    </span>
-                                                </th>
-                                            ))}
-                                        </tr>
-                                    ))}
-                                </thead>
-                                <tbody
-                                    className="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700"
-                                    {...getTableBodyProps}
+                        <div className="overflow-hidden">
+                            {shouldShowLoader ? (
+                                <div className="min-h-[400px]">
+                                    <Loading />
+                                </div>
+                            ) : (
+                                <table
+                                    className="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700"
+                                    {...getTableProps}
                                 >
-                                    {page.map((row) => {
-                                        prepareRow(row);
-                                        return (
-                                            <tr {...row.getRowProps()}
-                                                className={`${getRowBackground(row)}`}
-                                            >
-                                                {
-                                                    row.cells.map((cell) => {
-                                                        return (
-                                                            <td {...cell.getCellProps()} className="table-td">
-                                                                {cell.render("Cell")}
-                                                            </td>
-                                                        );
-                                                    })
-                                                }
+                                    <thead className="bg-slate-200 dark:bg-slate-700">
+                                        {headerGroups.map((headerGroup) => (
+                                            <tr {...headerGroup.getHeaderGroupProps()}>
+                                                {headerGroup.headers.map((column) => (
+                                                    <th
+                                                        {...column.getHeaderProps(
+                                                            column.getSortByToggleProps()
+                                                        )}
+                                                        scope="col"
+                                                        className=" table-th "
+                                                    >
+                                                        {column.render("Header")}
+                                                        <span>
+                                                            {column.isSorted
+                                                                ? column.isSortedDesc
+                                                                    ? " 🔽"
+                                                                    : " 🔼"
+                                                                : ""}
+                                                        </span>
+                                                    </th>
+                                                ))}
                                             </tr>
-                                        );
-                                    })}
-                                </tbody>
-                            </table>
+                                        ))}
+                                    </thead>
+                                    <tbody
+                                        className="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700"
+                                        {...getTableBodyProps}
+                                    >
+                                        {page.map((row) => {
+                                            prepareRow(row);
+                                            return (
+                                                <tr {...row.getRowProps()}
+                                                    className={`${getRowBackground(row)}`}
+                                                >
+                                                    {
+                                                        row.cells.map((cell) => {
+                                                            return (
+                                                                <td {...cell.getCellProps()} className="table-td">
+                                                                    {cell.render("Cell")}
+                                                                </td>
+                                                            );
+                                                        })
+                                                    }
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            )}
                         </div>
                     </div>
                 </div>

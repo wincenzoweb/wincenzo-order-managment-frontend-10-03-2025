@@ -20,6 +20,7 @@ import { toggleEmailModal } from "./sendMailReducer/emailSlice";
 import DeleteConfirm from "./DeleteConfirmModel";
 import { editPendingData, getPaginatedPendingOrders, toggleConfirmModal, toggleDetailModal, getDuplicateBarcodeNumbers } from "./PendingOrderReducer/pendingOrderSlice";
 import Datepicker from "react-tailwindcss-datepicker";
+import Loading from "@/components/Loading";
 
 const IndeterminateCheckbox = React.forwardRef(
     ({ indeterminate, ...rest }, ref) => {
@@ -54,7 +55,7 @@ const PendingOrderList = () => {
     const [selectedEndDate, setSelectedEndDate] = useState(null);
     const [filterByDuplicateBarcode, setFilterByDuplicateBarcode] = useState(false);
 
-    const { pendingOrder, totalData, totalPages, duplicateBarcodeNumbers, totalSameDuplicateNumbers } = useSelector((state) => state.pendingorder);
+    const { pendingOrder, isLoading, totalData, totalPages, duplicateBarcodeNumbers, totalSameDuplicateNumbers } = useSelector((state) => state.pendingorder);
     const role = useSelector((state) => state.user?.loggedInUser?.role);
 
     const handleValueChange = (newValue) => {
@@ -532,6 +533,8 @@ const PendingOrderList = () => {
         setCsvData(dataToExport);
     };
 
+    // Add this check for showing loader
+    const shouldShowLoader = isLoading || !pendingOrder || pendingOrder.length === 0;
 
     return (
         <>
@@ -603,59 +606,78 @@ const PendingOrderList = () => {
                 </div>
                 <div className="overflow-x-auto -mx-6">
                     <div className="inline-block min-w-full align-middle">
-                        <div className="overflow-hidden ">
-                            <table
-                                className="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700"
-                                {...getTableProps}
-                            >
-                                <thead className="bg-slate-200 dark:bg-slate-700">
-                                    {headerGroups.map((headerGroup) => (
-                                        <tr {...headerGroup.getHeaderGroupProps()}>
-                                            {headerGroup.headers.map((column) => (
-                                                <th
-                                                    {...column.getHeaderProps(
-                                                        column.getSortByToggleProps()
-                                                    )}
-                                                    scope="col"
-                                                    className=" table-th "
-                                                >
-                                                    {column.render("Header")}
-                                                    <span>
-                                                        {column.isSorted
-                                                            ? column.isSortedDesc
-                                                                ? " 🔽"
-                                                                : " 🔼"
-                                                            : ""}
-                                                    </span>
-                                                </th>
-                                            ))}
-                                        </tr>
-                                    ))}
-                                </thead>
-                                <tbody
-                                    className="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700"
-                                    {...getTableBodyProps}
+                        <div className="overflow-hidden">
+                            {shouldShowLoader ? (
+                                <div className="min-h-[400px]">
+                                    <Loading />
+                                </div>
+                            ) : (
+                                <table
+                                    className="min-w-full divide-y divide-slate-100 table-fixed dark:divide-slate-700"
+                                    {...getTableProps}
                                 >
-                                    {page.map((row) => {
-                                        prepareRow(row);
-                                        return (
-                                            <tr {...row.getRowProps()}
-                                                className={`${getRowBackground(row)}`}
-                                            >
-                                                {
-                                                    row.cells.map((cell) => {
-                                                        return (
-                                                            <td {...cell.getCellProps()} className="table-td">
-                                                                {cell.render("Cell")}
-                                                            </td>
-                                                        );
-                                                    })
-                                                }
+                                    <thead className="bg-slate-200 dark:bg-slate-700">
+                                        {headerGroups.map((headerGroup) => (
+                                            <tr {...headerGroup.getHeaderGroupProps()}>
+                                                {headerGroup.headers.map((column) => (
+                                                    <th
+                                                        {...column.getHeaderProps(
+                                                            column.getSortByToggleProps()
+                                                        )}
+                                                        scope="col"
+                                                        className="table-th"
+                                                    >
+                                                        {column.render("Header")}
+                                                        <span>
+                                                            {column.isSorted
+                                                                ? column.isSortedDesc
+                                                                    ? " 🔽"
+                                                                    : " 🔼"
+                                                                : ""}
+                                                        </span>
+                                                    </th>
+                                                ))}
                                             </tr>
-                                        );
-                                    })}
-                                </tbody>
-                            </table>
+                                        ))}
+                                    </thead>
+                                    <tbody
+                                        className="bg-white divide-y divide-slate-100 dark:bg-slate-800 dark:divide-slate-700"
+                                        {...getTableBodyProps}
+                                    >
+                                        {page.length === 0 ? (
+                                            <tr>
+                                                <td 
+                                                    colSpan={columns.length} 
+                                                    className="text-center py-6 text-slate-500"
+                                                >
+                                                    No data available
+                                                </td>
+                                            </tr>
+                                        ) : (
+                                            page.map((row) => {
+                                                prepareRow(row);
+                                                return (
+                                                    <tr 
+                                                        {...row.getRowProps()}
+                                                        className={`${getRowBackground(row)}`}
+                                                    >
+                                                        {row.cells.map((cell) => {
+                                                            return (
+                                                                <td 
+                                                                    {...cell.getCellProps()} 
+                                                                    className="table-td"
+                                                                >
+                                                                    {cell.render("Cell")}
+                                                                </td>
+                                                            );
+                                                        })}
+                                                    </tr>
+                                                );
+                                            })
+                                        )}
+                                    </tbody>
+                                </table>
+                            )}
                         </div>
                     </div>
                 </div>

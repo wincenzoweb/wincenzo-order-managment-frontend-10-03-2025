@@ -1,6 +1,6 @@
 import axios from 'axios';
-
-const BASE_URL = 'http://localhost:5000/api';  // Backend API base URL
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+  // Backend API base URL
 
 // Function to call the backend API to track order by AWB
 export const trackOrderByAWB = async (awb) => {

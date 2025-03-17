@@ -15,6 +15,7 @@ const Ecommerce = () => {
   const { allOrderStatistics, branchOrderStatistics } = useSelector((state) => state.statistics);
   console.log("first",allOrderStatistics,branchOrderStatistics)
 
+
   const [selectedStartDate, setSelectedStartDate] = useState(null);
   const [selectedEndDate, setSelectedEndDate] = useState(null);
 
@@ -31,6 +32,7 @@ const Ecommerce = () => {
   };
 
   const isBranchAdminOrEmployee = User?.role === 'branchAdmin' || User?.role === 'employee';
+  console.log("ayaa pochyo1");
 
   return (
     <div className="space-y-5">

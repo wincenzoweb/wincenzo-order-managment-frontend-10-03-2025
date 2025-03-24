@@ -15,7 +15,7 @@ import ViewReturnAndPendingData from "./ViewReturnAndPendingData.jsx";
 import { getAllBookingData } from "../Booking Files/BookingReducer/BookingSlice";
 import Tooltip from "@/components/ui/Tooltip";
 import Icon from "@/components/ui/Icon";
-import InfooPage from "./Infoo.jsx";
+import InfooPage from "./infoo.jsx";
 
 
 const ReturnAndPendingPage = () => {
